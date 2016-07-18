@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <section class="kc-ranking-wrapper" style="width:100%">
+   <nav class="blue-background">
+      <h1>Lesson Maker</h1>
+   </nav>
+   <div class="questions-div" style="width:90%">
+      <div class="row" id="Lesson-Label">
+            <div class="col-xs-3">
+                 <label class="form-control-label json-labels" for="inputSuccess1"><span id="optionNumber">Lesson Number:</span></label>
+             </div>
+             <div class="col-xs-9">
+                  <input type="text" class="form-control kc-input " id="lesson-number">
+             </div>
+      </div>
+       <div class="form-group" id="template-form" style="margin: 1em;"> 
+         <div class="row" id="inputTemplate">
+           <h2 id="template-title">Template_Lesson_Welcome</h2>
+            <div class="col-xs-3">
+                 <label class="form-control-label json-labels" for="inputSuccess1"><span id="labelText"></span></label>
+             </div>
+             <div class="col-xs-9">
+                  <input type="text" class="form-control json-input" id="title">
+             </div>  
+         </div>         
+        </div>
+         
+<script>     
+$.get("content/templates/MasterTemplateList.json", 
+    function(data){
+
+    var inputTemplateDiv = $("#inputTemplate").clone();
+	$("#inputTemplate").remove();
+    
+    $.each(data, function (index, value) {
+        var templateTitle = "templateForm-" + (index + 1);
+        var form = $('<form id='+templateTitle+' class="forms"></form>');
+        $("#template-form").append(form);             
+        $.each(value, function (key,val) {
+            var templateTitle = key == "templateID" ? val: "";   
+            var cloneInputDiv = inputTemplateDiv.clone();
+            cloneInputDiv.find('#template-title').text(templateTitle); 
+            cloneInputDiv.find('#labelText').text(key);
+            cloneInputDiv.find('#title').attr("id", key);
+            cloneInputDiv.find('#title').attr("name", key);
+            form.append(cloneInputDiv);
+        });
+         form.append('<button id=' + templateTitle + ' class="btn wfp-btn-active" style="margin-bottom: 2em; type="submit">Add Template</button>');      
+    });  
+});
+       
+    
+$(document).on('submit', 'form', function( event ) {
+   event.preventDefault();
+   var $form = $( this );
+   var lessonNumber = "lesson"+$(this).parent().siblings().find('#lesson-number').val();
+   var formChildren = $form.children().children().find('input');      
+   var values = {lesson: lessonNumber};
+    
+    $.each(formChildren,function() {
+        values[this.id] = $(this).val();
+    });
+   
+    _post(values);     
+});
+       
+                                                      
+function _post (templateObj) {
+    var URL ="http://localhost:8080";   
+    $.post(URL + "/api/jsonmaker", templateObj,
+      function(data){
+      });
+    return false;           
+}           
+</script>
+</body>
+</html>
